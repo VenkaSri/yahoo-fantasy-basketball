@@ -4,9 +4,12 @@ package com.warrencrasta.fantasy.yahoo.config.batch;
 import com.warrencrasta.fantasy.yahoo.batchprocessing.StatsDataProcessor;
 import com.warrencrasta.fantasy.yahoo.batchprocessing.StatsInput;
 import com.warrencrasta.fantasy.yahoo.domain.stat.Stat;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
@@ -28,11 +31,16 @@ public class BatchConfig {
           "Rk","Player","Pos","Age","Tm","G","GS","MP","FG","FGA","FGP","threeP","threePA","threePP","twoP","twoPA","twoPP","eFGP","FT","FTA","FTP","ORB","DRB","TRB","AST","STL","BLK","TOV","PF","PTS"
   };
 
-  @Autowired
-  public JobBuilderFactory jobBuilderFactory;
+
+  public final JobBuilderFactory jobBuilderFactory;
+
+  private final StepBuilderFactory stepBuilderFactory;
 
   @Autowired
-  public StepBuilderFactory stepBuilderFactory;
+  public BatchConfig(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
+    this.jobBuilderFactory = jobBuilderFactory;
+    this.stepBuilderFactory = stepBuilderFactory;
+  }
 
   @Bean
   public FlatFileItemReader<StatsInput> reader() {
@@ -56,8 +64,29 @@ public class BatchConfig {
   public JdbcBatchItemWriter<Stat> writer(DataSource dataSource) {
     return new JdbcBatchItemWriterBuilder<Stat>()
             .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-            .sql("INSERT INTO stat (first_name, last_name) VALUES (:firstName, :lastName)")
+            .sql("INSERT INTO stat (Player, FGP, threePP, FTP, TRB, AST, STL, BLK, TOV, PTS) " +
+                    " VALUES (:Player, :FGP, :threePP, :FTP, :TRB, :AST, :STL, :BLK, :TOV, :PTS)")
             .dataSource(dataSource)
+            .build();
+  }
+
+  @Bean
+  public Job importUserJob(JobCompletionNotificationListener listener, Step step1) {
+    return jobBuilderFactory.get("importUserJob")
+            .incrementer(new RunIdIncrementer())
+            .listener(listener)
+            .flow(step1)
+            .end()
+            .build();
+  }
+
+  @Bean
+  public Step step1(JdbcBatchItemWriter<Stat> writer) {
+    return stepBuilderFactory.get("step1")
+            .<StatsInput, Stat> chunk(10)
+            .reader(reader())
+            .processor(processor())
+            .writer(writer)
             .build();
   }
 
