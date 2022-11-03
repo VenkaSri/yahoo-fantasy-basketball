@@ -28,6 +28,7 @@ public class LeagueController {
 
   @GetMapping("/{leagueId}/info")
   public LeagueInfoDTO getLeagueInfo(@PathVariable @NotBlank String leagueId) {
+    System.out.println(leagueService.getRelevantCategories(leagueId));
     return leagueService.getLeagueInfo(leagueId);
   }
 
@@ -36,4 +37,5 @@ public class LeagueController {
       @PathVariable String leagueId, @RequestParam String week, @RequestParam String teamId) {
     return scoreboardService.getWeeklyMatchups(leagueId, week, teamId);
   }
+
 }

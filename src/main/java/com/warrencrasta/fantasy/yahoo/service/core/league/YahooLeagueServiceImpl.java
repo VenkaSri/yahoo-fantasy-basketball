@@ -70,7 +70,6 @@ public class YahooLeagueServiceImpl implements LeagueService {
 
       relevantCategories.add(statCategory);
     }
-
     return relevantCategories;
   }
 

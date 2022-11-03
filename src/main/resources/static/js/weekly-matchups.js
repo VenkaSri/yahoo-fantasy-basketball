@@ -94,4 +94,11 @@ $(document).ready(function() {
 $("#menu-toggle").click(function(e) {
   e.preventDefault();
   $("#wrapper").toggleClass("toggled");
+})
+
+
+
+$("#show-stats").click(function(e) {
+    e.preventDefault();
+    $("#wrapper").toggleClass("toggled");
 });

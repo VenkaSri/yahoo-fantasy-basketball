@@ -31,16 +31,11 @@ public class BatchConfig {
           "Rk","Player","Pos","Age","Tm","G","GS","MP","FG","FGA","FGP","threeP","threePA","threePP","twoP","twoPA","twoPP","eFGP","FT","FTA","FTP","ORB","DRB","TRB","AST","STL","BLK","TOV","PF","PTS"
   };
 
-
-  public final JobBuilderFactory jobBuilderFactory;
-
-  private final StepBuilderFactory stepBuilderFactory;
-
   @Autowired
-  public BatchConfig(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
-    this.jobBuilderFactory = jobBuilderFactory;
-    this.stepBuilderFactory = stepBuilderFactory;
-  }
+  public JobBuilderFactory jobBuilderFactory;
+  @Autowired
+  public StepBuilderFactory stepBuilderFactory;
+
 
   @Bean
   public FlatFileItemReader<StatsInput> reader() {

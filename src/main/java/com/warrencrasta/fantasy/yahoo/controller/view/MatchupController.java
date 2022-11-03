@@ -19,4 +19,9 @@ public class MatchupController {
     model.addAttribute("seasons", userService.getSeasonsForUser());
     return "weekly-matchups";
   }
+
+  @GetMapping("/trade-hub")
+  public String tradeHub(Model model) {
+    return "trade-hub";
+  }
 }

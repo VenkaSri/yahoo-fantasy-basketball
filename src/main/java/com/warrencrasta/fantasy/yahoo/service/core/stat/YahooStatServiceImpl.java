@@ -88,6 +88,7 @@ public class YahooStatServiceImpl implements StatService {
     }
 
     statsForTeam.setStatCategories(statCategories);
+
     return statsForTeam;
   }
 
